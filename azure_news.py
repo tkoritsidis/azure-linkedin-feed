@@ -6,33 +6,45 @@ RSS_URL = "https://www.microsoft.com/releasecommunications/api/v2/azure/rss"
 feed = feedparser.parse(RSS_URL)
 
 if not feed.entries:
-    raise Exception("No Azure updates returned from Microsoft RSS feed.")
+    raise Exception("No Azure updates returned from Microsoft RSS")
 
-item = feed.entries[0]
-
-title = item.title
-link = item.link
-
-summary = ""
-
-if hasattr(item, "summary"):
-    summary = item.summary
+updates = feed.entries[:5]
 
 post = f"""
-Latest Azure Update
+Latest Azure Updates
 
-Date: {datetime.utcnow().strftime('%Y-%m-%d')}
+Generated: {datetime.utcnow().strftime('%Y-%m-%d %H:%M UTC')}
 
-Title:
-{title}
+"""
 
-Summary:
-{summary[:500]}
+for i, item in enumerate(updates, start=1):
+
+    title = item.get("title", "Azure Update")
+    link = item.get("link", "")
+
+    summary = item.get("summary", "")
+    summary = summary.replace("\n", " ")
+    summary = summary[:250]
+
+    post += f"""
+{i}. {title}
+
+{summary}
 
 Read more:
 {link}
 
-#Azure #MicrosoftAzure #CloudComputing #AzureArchitecture #AzureMVP
+--------------------------------------------------
+
+"""
+
+post += """
+#Azure
+#MicrosoftAzure
+#AzureArc
+#AzureLocal
+#AzureNetworking
+#AzureMVP
 """
 
 with open("linkedin_post.txt", "w", encoding="utf-8") as f:
