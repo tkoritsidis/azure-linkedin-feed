@@ -1,36 +1,23 @@
-import urllib.request
-import json
+from datetime import datetime
 
-url = "https://azure.microsoft.com/api/v3/blog/posts/"
+post = f"""
+🚀 Azure Daily Update
 
-try:
-    response = urllib.request.urlopen(url)
-    data = json.loads(response.read())
+Generated automatically on:
+{datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')} UTC
 
-    if len(data) == 0:
-        raise Exception("No Azure blog posts returned")
+Today's focus:
+✅ Azure Architecture
+✅ Azure Arc
+✅ Azure Local
+✅ Azure Virtual Desktop
 
-    article = data[0]
-
-    title = article.get("title", "Azure Update")
-    link = article.get("url", "https://azure.microsoft.com/blog")
-
-    post = f"""
-🚀 New Microsoft Azure Update
-
-{title}
-
-Read more:
-{link}
+Follow Microsoft Azure announcements for the latest updates.
 
 #Azure #MicrosoftAzure #CloudComputing #AzureArchitecture #AzureMVP
 """
 
-    with open("linkedin_post.txt", "w", encoding="utf-8") as f:
-        f.write(post)
+with open("linkedin_post.txt", "w", encoding="utf-8") as f:
+    f.write(post)
 
-    print(post)
-
-except Exception as e:
-    print(f"ERROR: {e}")
-    raise
+print(post)
