@@ -1,35 +1,31 @@
 name: Azure News Feed
 
 on:
-workflow_dispatch:
- 
-schedule:
-- cron: '0 7 * * *'
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-    - name: Setup Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.12'
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
 
-    - name: Install dependencies
-      run: |
-        pip install -r requirements.txt
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
 
-    - name: Run script
-      run: |
-        python azure_news.py
-    - name: Upload Azure News
-  uses
+      - name: Run script
+        run: |
+          python azure_news.py
 
-    - name: Upload artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: linkedin-post
-        path: linkedin_post.txt
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: linkedin-post
+          path: linkedin_post.txt
