@@ -1,21 +1,21 @@
-import feedparser
+import urllib.request
+import json
 
-# Azure Blog RSS Feed
-rss = "https://techcommunity.microsoft.com/plugins/custom/microsoft/o365/custom-blog-rss?tid=Azure"
+url = "https://azure.microsoft.com/api/v3/blog/posts/"
 
-feed = feedparser.parse(rss)
+try:
+    response = urllib.request.urlopen(url)
+    data = json.loads(response.read())
 
-print(f"Entries found: {len(feed.entries)}")
+    if len(data) == 0:
+        raise Exception("No Azure blog posts returned")
 
-if not feed.entries:
-    raise Exception("RSS feed returned no articles")
+    article = data[0]
 
-article = feed.entries[0]
+    title = article.get("title", "Azure Update")
+    link = article.get("url", "https://azure.microsoft.com/blog")
 
-title = article.title
-link = article.link
-
-post = f"""
+    post = f"""
 🚀 New Microsoft Azure Update
 
 {title}
@@ -26,7 +26,11 @@ Read more:
 #Azure #MicrosoftAzure #CloudComputing #AzureArchitecture #AzureMVP
 """
 
-with open("linkedin_post.txt", "w", encoding="utf-8") as f:
-    f.write(post)
+    with open("linkedin_post.txt", "w", encoding="utf-8") as f:
+        f.write(post)
 
-print(post)
+    print(post)
+
+except Exception as e:
+    print(f"ERROR: {e}")
+    raise
