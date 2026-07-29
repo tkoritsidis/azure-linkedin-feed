@@ -1,7 +1,10 @@
 name: Azure News Feed
 
 on:
-  workflow_dispatch:
+workflow_dispatch:
+ 
+schedule:
+- cron: '0 7 * * *'
 
 jobs:
   build:
