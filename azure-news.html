@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Azure News</title>
+</head>
+<body>
+
+<h1>Latest Azure Update</h1>
+
+<pre id="content">
+Loading...
+</pre>
+
+<script>
+fetch('linkedin_post.txt')
+.then(r => r.text())
+.then(t => {
+ 
