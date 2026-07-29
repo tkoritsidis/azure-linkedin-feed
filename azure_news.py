@@ -1,6 +1,7 @@
 import feedparser
 import html
 import re
+import json
 from datetime import datetime, timezone
 
 
@@ -556,7 +557,35 @@ def main():
             "The RSS feed returned entries, but no usable Azure "
             "updates were found."
         )
+import json
 
+linkedin_input = []
+
+for result in selected_updates:
+    item = result["item"]
+
+    linkedin_input.append(
+        {
+            "title": result["title"],
+            "summary": get_item_summary(item),
+            "link": item.get("link", ""),
+            "score": result["score"],
+        }
+    )
+
+with open(
+    "azure_updates.json",
+    "w",
+    encoding="utf-8",
+) as output_file:
+    json.dump(
+        linkedin_input,
+        output_file,
+        ensure_ascii=False,
+        indent=2,
+    )
+
+print("Created: azure_updates.json")
     post = build_post(selected_updates)
 
     with open(
