@@ -1,20 +1,26 @@
 from datetime import datetime
 
+today = datetime.utcnow().strftime("%Y-%m-%d")
+
 post = f"""
 🚀 Azure Daily Update
 
-Generated automatically on:
-{datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')} UTC
+Date: {today}
 
-Today's focus:
-✅ Azure Architecture
+Today's focus areas:
 ✅ Azure Arc
 ✅ Azure Local
 ✅ Azure Virtual Desktop
+✅ Azure AI
+✅ Azure Networking
 
-Follow Microsoft Azure announcements for the latest updates.
+Stay up to date with Microsoft's latest cloud innovations.
 
-#Azure #MicrosoftAzure #CloudComputing #AzureArchitecture #AzureMVP
+#Azure
+#MicrosoftAzure
+#CloudComputing
+#AzureArchitecture
+#AzureMVP
 """
 
 with open("linkedin_post.txt", "w", encoding="utf-8") as f:
