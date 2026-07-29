@@ -31,3 +31,12 @@ jobs:
         with:
           name: linkedin-post
           path: linkedin_post.txt
+
+      - name: Upload to koritsidis.me
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_HOST }}
+          username: ${{ secrets.FTP_USER }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: ./
+          server-dir: ${{ secrets.FTP_PATH }}
