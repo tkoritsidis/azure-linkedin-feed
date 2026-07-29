@@ -1,8 +1,12 @@
 import feedparser
 
-rss = "https://techcommunity.microsoft.com/rss/board?board.id=AzureBlog"
+rss = "https://azure.microsoft.com/en-us/updates/feed/"
 
 feed = feedparser.parse(rss)
+
+if len(feed.entries) == 0:
+    print("No articles found in feed")
+    exit(1)
 
 article = feed.entries[0]
 
@@ -10,16 +14,14 @@ title = article.title
 link = article.link
 
 post = f"""
-🚀 New Microsoft Azure Update
+🚀 New Azure Update
 
 {title}
 
-🔗 {link}
+Read more:
+{link}
 
-Key takeaway:
-This latest Azure update brings new capabilities that can help organizations modernize and optimize their cloud environments.
-
-#Azure #MicrosoftAzure #CloudComputing #AzureArchitecture #AzureMVP
+#Azure #MicrosoftAzure #CloudComputing #AzureArchitect
 """
 
 with open("linkedin_post.txt", "w", encoding="utf-8") as f:
