@@ -1,26 +1,38 @@
+import feedparser
 from datetime import datetime
 
-today = datetime.utcnow().strftime("%Y-%m-%d")
+RSS_URL = "https://www.microsoft.com/releasecommunications/api/v2/azure/rss"
+
+feed = feedparser.parse(RSS_URL)
+
+if not feed.entries:
+    raise Exception("No Azure updates returned from Microsoft RSS feed.")
+
+item = feed.entries[0]
+
+title = item.title
+link = item.link
+
+summary = ""
+
+if hasattr(item, "summary"):
+    summary = item.summary
 
 post = f"""
-🚀 Azure Daily Update
+Latest Azure Update
 
-Date: {today}
+Date: {datetime.utcnow().strftime('%Y-%m-%d')}
 
-Today's focus areas:
-✅ Azure Arc
-✅ Azure Local
-✅ Azure Virtual Desktop
-✅ Azure AI
-✅ Azure Networking
+Title:
+{title}
 
-Stay up to date with Microsoft's latest cloud innovations.
+Summary:
+{summary[:500]}
 
-#Azure
-#MicrosoftAzure
-#CloudComputing
-#AzureArchitecture
-#AzureMVP
+Read more:
+{link}
+
+#Azure #MicrosoftAzure #CloudComputing #AzureArchitecture #AzureMVP
 """
 
 with open("linkedin_post.txt", "w", encoding="utf-8") as f:
