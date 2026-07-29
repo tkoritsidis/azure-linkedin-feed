@@ -1,12 +1,13 @@
 import feedparser
 
-rss = "https://azure.microsoft.com/en-us/updates/feed/"
+rss = "https://techcommunity.microsoft.com/gxcuf89792/rss/board?board.id=Azure"
 
 feed = feedparser.parse(rss)
 
+print(f"Entries found: {len(feed.entries)}")
+
 if len(feed.entries) == 0:
-    print("No articles found in feed")
-    exit(1)
+    raise Exception("RSS feed returned no articles")
 
 article = feed.entries[0]
 
@@ -14,14 +15,14 @@ title = article.title
 link = article.link
 
 post = f"""
-🚀 New Azure Update
+🚀 New Azure Article
 
 {title}
 
 Read more:
 {link}
 
-#Azure #MicrosoftAzure #CloudComputing #AzureArchitect
+#Azure #MicrosoftAzure #Cloud #AzureArchitecture
 """
 
 with open("linkedin_post.txt", "w", encoding="utf-8") as f:
