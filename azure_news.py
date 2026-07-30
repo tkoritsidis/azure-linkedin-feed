@@ -1,8 +1,11 @@
 from datetime import datetime
 
-post = f"""🚀 Azure Executive Update
+today = datetime.utcnow().strftime("%Y-%m-%d")
 
-Date: {datetime.utcnow().strftime('%Y-%m-%d')}
+content = f"""
+Azure Executive Update
+
+Date: {today}
 
 ✅ Azure Arc
 ✅ Azure Local
@@ -12,13 +15,12 @@ Date: {datetime.utcnow().strftime('%Y-%m-%d')}
 
 Executive Summary
 
-This is a test generated from GitHub Actions.
+This is a test post generated from GitHub Actions.
 
 #Azure #MicrosoftAzure #AzureMVP
 """
 
 with open("linkedin_post.txt", "w", encoding="utf-8") as f:
-    f.write(post)
+    f.write(content)
 
-print("Created: linkedin_post.txt")
-print(post)
+print("linkedin_post.txt created successfully")
