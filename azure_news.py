@@ -277,6 +277,7 @@ def write_outputs(selected: list[dict]) -> None:
             }
         )
     linkedin_candidates = []
+    for item in selected:
         linkedin_candidates.append(
             {
                 "selected": False,
