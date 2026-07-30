@@ -44,3 +44,17 @@ with open("linkedin_post.txt", "w", encoding="utf-8") as f:
     f.write(content)
 
 print("linkedin_post.txt created successfully")
+
+updates = [
+{
+"title": "Azure Monitor Logs mirroring into Microsoft Fabric",
+"status": "Preview",
+"category": "Management & Governance",
+"summary": "Mirror Log Analytics data into Microsoft Fabric."
+}
+]
+ 
+with open("azure_updates.json", "w", encoding="utf-8") as f:
+json.dump(updates, f, indent=2, ensure_ascii=False)
+ 
+print("Created: azure_updates.json")
