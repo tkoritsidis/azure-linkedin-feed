@@ -17,6 +17,7 @@ RSS_URL = "https://www.microsoft.com/releasecommunications/api/v2/azure/rss"
 MAX_UPDATES = 5
 OUTPUT_TEXT = Path("linkedin_post.txt")
 OUTPUT_JSON = Path("azure_updates.json")
+OUTPUT_CANDIDATES = Path("linkedin_candidates.json")
 USER_AGENT = "koritsidis.me-azure-news/1.0"
 
 PRIORITY_KEYWORDS = {
@@ -275,13 +276,28 @@ def write_outputs(selected: list[dict]) -> None:
                 "published_utc": item["published"].isoformat(),
             }
         )
+    linkedin_candidates = []
+        linkedin_candidates.append(
+            {
+                "selected": False,
+                "[3. στοn_ready": item["score"] >= 25,
+                "priority": item["score"],
+                "title": item["title"],
+                "summary": shorten(item["summary"], 200),
+                "link": item["link"],
+                "status": release_status(item),
+                "topics": item["topics"]
+            }
+        )
     OUTPUT_JSON.write_text(json.dumps(json_items, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    OUTPUT_CANDIDATES.write_text(json.dumps(linkedin_candidates,indent=2,ensure_ascii=False) + "\n",encoding="utf-8")
 
     if OUTPUT_TEXT.stat().st_size == 0:
         raise RuntimeError("linkedin_post.txt was created but is empty")
 
     print("Created: " + str(OUTPUT_TEXT))
     print("Created: " + str(OUTPUT_JSON))
+    print("Created: " + str(OUTPUT_CANDIDATES))
     print("linkedin_post.txt bytes: " + str(OUTPUT_TEXT.stat().st_size))
     print(post)
 
