@@ -356,6 +356,11 @@ def main():
 
     if not feed.entries:
         raise RuntimeError("No Azure updates were returned by the RSS feed.")
+        with open("linkedin_post.txt", "w", encoding="utf-8") as f:
+f.write("HELLO FROM GITHUB ACTION")
+ 
+print("Created test linkedin_post.txt")
+return
 
     selected_updates = get_important_updates(feed, maximum=MAX_UPDATES)
 
@@ -373,6 +378,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-with open("linkedin_post.txt", "w", encoding="utf-8") as f:
-f.write("HELLO FROM GITHUB ACTION")
