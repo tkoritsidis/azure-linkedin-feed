@@ -299,7 +299,6 @@ def write_outputs(selected: list[dict]) -> None:
 linkedin_candidates,
 key=lambda x: x["priority"]
 )
- 
 post_content = f"""🚀 Azure Executive Update
  
 {best_candidate["title"]}
