@@ -276,18 +276,20 @@ def write_outputs(selected: list[dict]) -> None:
                 "published_utc": item["published"].isoformat(),
             }
         )
-    linkedin_candidates = []
+        linkedin_candidates = []
+
     for item in selected:
         linkedin_candidates.append(
             {
                 "selected": False,
-                "[3. στοn_ready": item["score"] >= 25,
+                "linkedin_ready": item["score"] >= 25,
                 "priority": item["score"],
                 "title": item["title"],
                 "summary": shorten(item["summary"], 200),
                 "link": item["link"],
                 "status": release_status(item),
-                "topics": item["topics"]
+                "topics": item["topics"],
+                "published_utc": item["published"].isoformat(),
             }
         )
     OUTPUT_JSON.write_text(json.dumps(json_items, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
