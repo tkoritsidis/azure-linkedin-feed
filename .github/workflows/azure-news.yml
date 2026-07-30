@@ -2,48 +2,61 @@ name: Azure News Feed
 
 on:
   workflow_dispatch:
-
   schedule:
-    - cron: '0 7 * * *'
+    - cron: "0 7 * * *"
+
+permissions:
+  contents: read
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: "3.12"
 
-      - name: Install dependencies
+      - name: Validate Python syntax
+        run: python -m py_compile azure_news.py
+
+      - name: Generate Azure news files
+        run: python azure_news.py
+
+      - name: Validate generated files
         run: |
-          pip install -r requirements.txt
+          test -s linkedin_post.txt
+          test -s azure_updates.json
+          python -m json.tool azure_updates.json > /dev/null
+          echo "linkedin_post.txt bytes: $(wc -c < linkedin_post.txt)"
+          echo "azure_updates.json bytes: $(wc -c < azure_updates.json)"
 
-      - name: Run script
+      - name: Prepare deployment directory
         run: |
-          python azure_news.py
+          mkdir -p deploy
+          cp azure-news.html deploy/
+          cp linkedin_post.txt deploy/
+          cp azure_updates.json deploy/
 
-      - name: Upload artifact
+      - name: Upload generated artifact
         uses: actions/upload-artifact@v4
         with:
-          name: linkedin-post
-          path: linkedin_post.txt
+          name: azure-news-site
+          path: |
+            deploy/azure-news.html
+            deploy/linkedin_post.txt
+            deploy/azure_updates.json
 
-      - name: Upload to koritsidis.me
+      - name: Deploy to koritsidis.me via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.FTP_HOST }}
           username: ${{ secrets.FTP_USER }}
           password: ${{ secrets.FTP_PASSWORD }}
-          local-dir: ./
+          protocol: ftp
+          local-dir: ./deploy/
           server-dir: ${{ secrets.FTP_PATH }}
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: azure-news
-          path: |
-            linkedin_post.txt
-            azure_updates.json
