@@ -5,7 +5,6 @@ import re
 from datetime import datetime, timezone
 from email.utils import parsedate_to_datetime
 
-
 # ============================================================
 # Configuration
 # ============================================================
