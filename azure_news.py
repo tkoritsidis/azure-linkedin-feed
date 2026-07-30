@@ -313,7 +313,6 @@ Read more:
  
 #Azure #MicrosoftAzure #AzureArchitecture #HybridCloud #CloudSecurity #AzureMVP
 """
- 
 OUTPUT_TEXT.write_text(
 post_content + "\n",
 encoding="utf-8"
