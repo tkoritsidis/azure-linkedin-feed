@@ -295,10 +295,7 @@ def write_outputs(selected: list[dict]) -> None:
     
     
     OUTPUT_CANDIDATES.write_text(json.dumps(linkedin_candidates,indent=2,ensure_ascii=False) + "\n",encoding="utf-8")
-    best_candidate = max(
-linkedin_candidates,
-key=lambda x: x["priority"]
-)
+    best_candidate = max(linkedin_candidates,key=lambda x: x["priority"])
 post_content = f"""🚀 Azure Executive Update
 {best_candidate["title"]}
 {best_candidate["summary"]}
@@ -306,8 +303,10 @@ Why it matters:
 This Azure update may be relevant for organizations evaluating modernization, security, governance, resiliency, or operational improvements.
 Read more:
 {best_candidate["link"]}
-#Azure #MicrosoftAzure #AzureArchitecture #HybridCloud #CloudSecurity #AzureMVP
-"""
+#Azure #MicrosoftAzure #AzureArchitecture #HybridCloud #CloudSecurity #AzureMVP"""
+    
+
+
     OUTPUT_TEXT.write_text(post_content + "\n",encoding="utf-8")
     OUTPUT_JSON.write_text(json.dumps(json_items, indent=2, ensure_ascii=False)+ "\n",encoding="utf-8",)    
     OUTPUT_JSON.write_text(json.dumps(json_items, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
