@@ -557,7 +557,6 @@ def main():
             "The RSS feed returned entries, but no usable Azure "
             "updates were found."
         )
-import json
 
 linkedin_input = []
 
