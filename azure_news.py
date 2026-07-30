@@ -308,11 +308,7 @@ Read more:
 {best_candidate["link"]}
 #Azure #MicrosoftAzure #AzureArchitecture #HybridCloud #CloudSecurity #AzureMVP
 """
-OUTPUT_TEXT.write_text(post_content + "\n",encoding="utf-8")
-
-
-print("Best LinkedIn candidate: " + best_candidate["title"])
-print("LinkedIn score: " + str(best_candidate["priority"]))
+    OUTPUT_TEXT.write_text(post_content + "\n",encoding="utf-8")
     OUTPUT_JSON.write_text(json.dumps(json_items, indent=2, ensure_ascii=False)+ "\n",encoding="utf-8",)    
     OUTPUT_JSON.write_text(json.dumps(json_items, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     Path("linkedin_candidates.json").write_text(json.dumps(linkedin_candidates, indent=2, ensure_ascii=False) + "\n",encoding="utf-8",)
@@ -326,6 +322,8 @@ print("LinkedIn score: " + str(best_candidate["priority"]))
     print("Created: " + str(OUTPUT_CANDIDATES))
     print("Created: linkedin_candidates.json")
     print("linkedin_post.txt bytes: " + str(OUTPUT_TEXT.stat().st_size))
+    print("Best LinkedIn candidate: " + best_candidate["title"])
+    print("LinkedIn score: " + str(best_candidate["priority"]))
     print(post)
 
 
