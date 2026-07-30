@@ -8,31 +8,37 @@ xml_data = urllib.request.urlopen(RSS_URL).read()
 
 root = ET.fromstring(xml_data)
 
-updates = []
+content = f"""🚀 Azure Executive Update
+
+Date: {datetime.utcnow().strftime('%Y-%m-%d')}
+
+"""
+
+count = 0
 
 for item in root.iter():
     if item.tag.endswith("item"):
         title = ""
-        link = ""
 
         for child in item:
             if child.tag.endswith("title"):
                 title = child.text or ""
-            elif child.tag.endswith("link"):
-                link = child.text or ""
+                break
 
         if title:
-            updates.append((title, link))
+            count += 1
+            content += f"{count}. {title}\n\n"
 
-content = f"🚀 Azure Executive Update\n"
-content += f"Date: {datetime.utcnow().strftime('%Y-%m-%d')}\n\n"
+        if count >= 5:
+            break
 
-for i[ in root.iter():
- item.tag.endswith("item"):rt=1):
-    content += f"{i}. {title}\n"
-    content += f"{link}\n\n"
+content += """
+Executive Summary
 
-content += "#Azure #MicrosoftAzure #AzureMVP\n"
+Top Azure updates automatically collected from Microsoft's Azure Updates feed.
+
+#Azure #MicrosoftAzure #AzureMVP
+"""
 
 with open("linkedin_post.txt", "w", encoding="utf-8") as f:
     f.write(content)
