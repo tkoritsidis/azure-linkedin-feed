@@ -292,6 +292,9 @@ def write_outputs(selected: list[dict]) -> None:
                 "published_utc": item["published"].isoformat(),
             }
         )
+    
+    
+    OUTPUT_CANDIDATES.write_text(json.dumps(linkedin_candidates,indent=2,ensure_ascii=False) + "\n",encoding="utf-8")
     OUTPUT_JSON.write_text(json.dumps(json_items, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     Path("linkedin_candidates.json").write_text(json.dumps(linkedin_candidates, indent=2, ensure_ascii=False) + "\n",encoding="utf-8",)
    ## OUTPUT_CANDIDATES.write_text(json.dumps(linkedin_candidates,indent=2,ensure_ascii=False) + "\n",encoding="utf-8")
@@ -301,7 +304,7 @@ def write_outputs(selected: list[dict]) -> None:
 
     print("Created: " + str(OUTPUT_TEXT))
     print("Created: " + str(OUTPUT_JSON))
-    #print("Created: " + str(OUTPUT_CANDIDATES))
+    print("Created: " + str(OUTPUT_CANDIDATES))
     print("Created: linkedin_candidates.json")
     print("linkedin_post.txt bytes: " + str(OUTPUT_TEXT.stat().st_size))
     print(post)
