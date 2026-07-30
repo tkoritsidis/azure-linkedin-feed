@@ -41,6 +41,7 @@ jobs:
           cp azure-news.html deploy/
           cp linkedin_post.txt deploy/
           cp azure_updates.json deploy/
+          cp linkedin_candidates.json deploy/
 
       - name: Upload generated artifact
         uses: actions/upload-artifact@v4
