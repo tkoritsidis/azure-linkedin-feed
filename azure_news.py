@@ -5,10 +5,6 @@ import re
 from datetime import datetime, timezone
 from email.utils import parsedate_to_datetime
 
-# ============================================================
-# Configuration
-# ============================================================
-
 RSS_URL = "https://www.microsoft.com/releasecommunications/api/v2/azure/rss"
 MAX_UPDATES = 5
 
