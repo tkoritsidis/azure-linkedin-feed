@@ -302,14 +302,20 @@ def write_outputs(selected: list[dict]) -> None:
 
     best_candidate = max(linkedin_candidates, key=lambda x: x["priority"])
 
-    post_content = f"""🚀 Azure Executive Update
-{best_candidate["title"]}
-{best_candidate["summary"]}
+    post_content = f"""
+    🚀 Azure Executive Update
+
+    One important Azure announcement this week:
+    
+✅    {best_candidate["title"]}
+        {best_candidate["summary"]}
 Why it matters:
-This Azure update may be relevant for organizations evaluating modernization, security, governance, resiliency, or operational improvements.
+• Supports modernization initiatives
+• Improves operational consistency
+• Strengthens hybrid-cloud capabilities
 Read more:
 {best_candidate["link"]}
-#Azure #MicrosoftAzure #AzureArchitecture #HybridCloud #CloudSecurity #AzureMVP"""
+#Azure #MicrosoftAzure #AzureArchitecture #HybridCloud #CloudSecurity #AzureMVP""".strip()
 
     # Overwrite the text output with the compact LinkedIn-ready post (if intended)
     OUTPUT_TEXT.write_text(post_content + "\n", encoding="utf-8")
