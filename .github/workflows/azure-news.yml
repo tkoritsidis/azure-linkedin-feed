@@ -40,3 +40,10 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           local-dir: ./
           server-dir: ${{ secrets.FTP_PATH }}
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: azure-news
+          path: |
+            linkedin_post.txt
+            azure_updates.json
