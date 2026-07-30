@@ -263,6 +263,8 @@ def write_outputs(selected: list[dict]) -> None:
     OUTPUT_TEXT.write_text(post, encoding="utf-8", newline="\n")
 
     json_items = []
+    linkedin_candidates = []
+
     for item in selected:
         json_items.append(
             {
@@ -276,7 +278,6 @@ def write_outputs(selected: list[dict]) -> None:
                 "published_utc": item["published"].isoformat(),
             }
         )
-        linkedin_candidates = []
 
     for item in selected:
         linkedin_candidates.append(
@@ -292,11 +293,16 @@ def write_outputs(selected: list[dict]) -> None:
                 "published_utc": item["published"].isoformat(),
             }
         )
-    
-    
-    OUTPUT_CANDIDATES.write_text(json.dumps(linkedin_candidates,indent=2,ensure_ascii=False) + "\n",encoding="utf-8")
-    best_candidate = max(linkedin_candidates,key=lambda x: x["priority"])
-post_content = f"""🚀 Azure Executive Update
+
+    # Write candidate list file
+    OUTPUT_CANDIDATES.write_text(json.dumps(linkedin_candidates, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+
+    if not linkedin_candidates:
+        raise RuntimeError("No linkedin candidates were generated")
+
+    best_candidate = max(linkedin_candidates, key=lambda x: x["priority"])
+
+    post_content = f"""🚀 Azure Executive Update
 {best_candidate["title"]}
 {best_candidate["summary"]}
 Why it matters:
@@ -304,14 +310,13 @@ This Azure update may be relevant for organizations evaluating modernization, se
 Read more:
 {best_candidate["link"]}
 #Azure #MicrosoftAzure #AzureArchitecture #HybridCloud #CloudSecurity #AzureMVP"""
-    
 
+    # Overwrite the text output with the compact LinkedIn-ready post (if intended)
+    OUTPUT_TEXT.write_text(post_content + "\n", encoding="utf-8")
 
-    OUTPUT_TEXT.write_text(post_content + "\n",encoding="utf-8")
-    OUTPUT_JSON.write_text(json.dumps(json_items, indent=2, ensure_ascii=False)+ "\n",encoding="utf-8",)    
+    # Write JSON outputs
     OUTPUT_JSON.write_text(json.dumps(json_items, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
-    Path("linkedin_candidates.json").write_text(json.dumps(linkedin_candidates, indent=2, ensure_ascii=False) + "\n",encoding="utf-8",)
-   ## OUTPUT_CANDIDATES.write_text(json.dumps(linkedin_candidates,indent=2,ensure_ascii=False) + "\n",encoding="utf-8")
+    Path("linkedin_candidates.json").write_text(json.dumps(linkedin_candidates, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
 
     if OUTPUT_TEXT.stat().st_size == 0:
         raise RuntimeError("linkedin_post.txt was created but is empty")
