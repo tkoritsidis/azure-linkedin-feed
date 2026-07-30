@@ -317,7 +317,6 @@ OUTPUT_TEXT.write_text(
 post_content + "\n",
 encoding="utf-8"
 )
- 
 print("Best LinkedIn candidate: " + best_candidate["title"])
 print("LinkedIn score: " + str(best_candidate["priority"]))
  
