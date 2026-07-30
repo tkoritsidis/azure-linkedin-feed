@@ -319,7 +319,6 @@ encoding="utf-8"
 )
 print("Best LinkedIn candidate: " + best_candidate["title"])
 print("LinkedIn score: " + str(best_candidate["priority"]))
- 
     OUTPUT_JSON.write_text(json.dumps(json_items, indent=2, ensure_ascii=False)+ "\n",encoding="utf-8",)    
     OUTPUT_JSON.write_text(json.dumps(json_items, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     Path("linkedin_candidates.json").write_text(json.dumps(linkedin_candidates, indent=2, ensure_ascii=False) + "\n",encoding="utf-8",)
