@@ -373,3 +373,6 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+with open("linkedin_post.txt", "w", encoding="utf-8") as f:
+f.write("HELLO FROM GITHUB ACTION")
