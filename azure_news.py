@@ -13,7 +13,10 @@ from datetime import datetime, timezone
 from email.utils import parsedate_to_datetime
 from pathlib import Path
 
-RSS_URL = "https://www.microsoft.com/releasecommunications/api/v2/azure/rss"
+RSS_URL = [
+    "https://www.microsoft.com/releasecommunications/api/v2/azure/rss"
+    "https://techcommunity.microsoft.com/gxcuf89792/rss/board?board.id=Azure"
+]
 MAX_UPDATES = 5
 OUTPUT_TEXT = Path("linkedin_post.txt")
 OUTPUT_JSON = Path("azure_updates.json")
@@ -95,13 +98,17 @@ def child_text(element: ET.Element, names: tuple[str, ...]) -> str:
     return ""
 
 
-def fetch_rss() -> bytes:
+def fetch_feed(url: str) -> bytes:
     request = urllib.request.Request(
-        RSS_URL,
-        headers={"User-Agent": USER_AGENT, "Accept": "application/rss+xml, application/xml, text/xml"},
+        url,
+        headers={
+            "User-Agent": USER_AGENT,
+            "Accept": "application/rss+xml, application/xml, text/xml",
+        },
     )
-    with urllib.request.urlopen(request, timeout=30) as response:
-        return response.read()
+ 
+with urllib.request.urlopen(request, timeout=30) as response:
+return response.read()
 
 
 def parse_date(value: str) -> datetime:
@@ -339,21 +346,66 @@ Read more:
 
 def main() -> int:
     try:
-        xml_bytes = fetch_rss()
-        items = parse_items(xml_bytes)
-        if not items:
-            raise RuntimeError("The Azure RSS feed returned no readable items")
+        all_items = []
 
-        selected = select_updates(items, MAX_UPDATES)
+        for feed_url in RSS_FEEDS:
+            try:
+                print(f"Fetching: {feed_url}")
+
+                xml_bytes = fetch_feed(feed_url)
+
+                feed_items = parse_items(xml_bytes)
+
+                print(
+                    "Items found: "
+                    + str(len(feed_items))
+                )
+
+                all_items.extend(feed_items)
+
+            except Exception as feed_exc:
+                print(
+                    "WARNING: "
+                    + feed_url
+                    + " -> "
+                    + str(feed_exc),
+                    file=sys.stderr,
+                )
+
+        if not all_items:
+            raise RuntimeError(
+                "No readable items found in any RSS feed"
+            )
+
+        selected = select_updates(
+            all_items,
+            MAX_UPDATES,
+        )
+
         if not selected:
-            raise RuntimeError("No Azure updates were selected")
+            raise RuntimeError(
+                "No Azure updates were selected"
+            )
 
         write_outputs(selected)
-        print("Azure updates received: " + str(len(items)))
-        print("Azure updates selected: " + str(len(selected)))
+
+        print(
+            "Total updates received: "
+            + str(len(all_items))
+        )
+
+        print(
+            "Updates selected: "
+            + str(len(selected))
+        )
+
         return 0
+
     except Exception as exc:
-        print("ERROR: " + str(exc), file=sys.stderr)
+        print(
+            "ERROR: " + str(exc),
+            file=sys.stderr,
+        )
         return 1
 
 
