@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Create linkedin_post.txt from the official Microsoft Azure Updates RSS feed."""
+"""Create linkedin_post.txt from official Microsoft Azure updates RSS feeds."""
 
 from __future__ import annotations
 
@@ -13,10 +13,11 @@ from datetime import datetime, timezone
 from email.utils import parsedate_to_datetime
 from pathlib import Path
 
-RSS_URL = [
-    "https://www.microsoft.com/releasecommunications/api/v2/azure/rss"
-    "https://techcommunity.microsoft.com/gxcuf89792/rss/board?board.id=Azure"
+RSS_FEEDS = [
+    "[microsoft.com](https://www.microsoft.com/releasecommunications/api/v2/azure/rss)",
+    "[techcommunity.microsoft.com](https://techcommunity.microsoft.com/gxcuf89792/rss/board?board.id=Azure)",
 ]
+
 MAX_UPDATES = 5
 OUTPUT_TEXT = Path("linkedin_post.txt")
 OUTPUT_JSON = Path("azure_updates.json")
@@ -98,16 +99,15 @@ def child_text(element: ET.Element, names: tuple[str, ...]) -> str:
     return ""
 
 
-def fetch_feed(url: str) -> bytes:
+def fetch_feed(feed_url: str) -> bytes:
     request = urllib.request.Request(
-        url,
+        feed_url,
         headers={
             "User-Agent": USER_AGENT,
-            "Accept": "application/rss+xml, application/xml, text/xml",
         },
     )
-with urllib.request.urlopen(request, timeout=30) as response:
-return response.read()
+    with urllib.request.urlopen(request, timeout=30) as response:
+        return response.read()
 
 
 def parse_date(value: str) -> datetime:
@@ -119,6 +119,7 @@ def parse_date(value: str) -> datetime:
             return parsed.astimezone(timezone.utc)
         except (TypeError, ValueError, OverflowError):
             pass
+
         try:
             parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
             if parsed.tzinfo is None:
@@ -126,25 +127,36 @@ def parse_date(value: str) -> datetime:
             return parsed.astimezone(timezone.utc)
         except ValueError:
             pass
+
     return datetime(1970, 1, 1, tzinfo=timezone.utc)
 
 
 def parse_items(xml_bytes: bytes) -> list[dict]:
     root = ET.fromstring(xml_bytes)
-    elements = [node for node in root.iter() if node.tag.split("}")[-1].lower() in ("item", "entry")]
+    elements = [
+        node
+        for node in root.iter()
+        if node.tag.split("}")[-1].lower() in ("item", "entry")
+    ]
     items = []
 
     for position, element in enumerate(elements):
         title = clean_text(child_text(element, ("title",)))
-        summary = clean_text(child_text(element, ("description", "summary", "content", "encoded")))
+        summary = clean_text(
+            child_text(element, ("description", "summary", "content", "encoded"))
+        )
         link = child_text(element, ("link",))
+
         if not link:
             for child in list(element):
                 if child.tag.split("}")[-1].lower() == "link":
                     link = child.attrib.get("href", "")
                     if link:
                         break
-        published_raw = child_text(element, ("pubdate", "published", "updated", "date"))
+
+        published_raw = child_text(
+            element, ("pubdate", "published", "updated", "date")
+        )
 
         if title:
             items.append(
@@ -183,6 +195,7 @@ def score_item(item: dict) -> tuple[int, list[str]]:
 
 def select_updates(items: list[dict], maximum: int) -> list[dict]:
     ranked = []
+
     for item in items:
         score, topics = score_item(item)
         result = dict(item)
@@ -200,6 +213,7 @@ def select_updates(items: list[dict], maximum: int) -> list[dict]:
 
     selected = []
     seen = set()
+
     for item in ranked:
         normalized = re.sub(r"\W+", " ", item["title"].lower()).strip()
         if normalized in seen:
@@ -208,17 +222,26 @@ def select_updates(items: list[dict], maximum: int) -> list[dict]:
         selected.append(item)
         if len(selected) == maximum:
             break
+
     return selected
 
 
 def release_status(item: dict) -> str:
     text = (item["title"] + " " + item["summary"]).lower()
-    if "generally available" in text or "general availability" in text or "[launched]" in text:
+
+    if (
+        "generally available" in text
+        or "general availability" in text
+        or "[launched]" in text
+    ):
         return "Generally Available"
+
     if "public preview" in text or "in preview" in text or "[in preview]" in text:
         return "Public Preview"
+
     if "retire" in text or "deprecated" in text:
         return "Retirement or deprecation"
+
     return "Azure update"
 
 
@@ -226,16 +249,17 @@ def csa_perspective(item: dict) -> str:
     topics = item.get("topics", [])
     focus = ", ".join(topics[:3]) if topics else "architecture and operations"
     return (
-        "CSA perspective: Assess relevance for " + focus + ". "
-        "Validate regional availability, prerequisites, security, governance, "
-        "operational readiness and cost before production adoption."
+        "CSA perspective: Assess relevance for "
+        + focus
+        + ". Validate regional availability, prerequisites, security, governance, "
+        + "operational readiness and cost before production adoption."
     )
 
 
 def build_post(items: list[dict]) -> str:
     today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
     lines = [
-        "\U0001f680 Azure Executive Update",
+        "🚀 Azure Executive Update",
         "",
         "Date: " + today,
         "",
@@ -264,9 +288,25 @@ def build_post(items: list[dict]) -> str:
     return "\n".join(lines).strip() + "\n"
 
 
+def build_linkedin_post(best_candidate: dict) -> str:
+    return (
+        "🚀 Azure Executive Update\n\n"
+        "One important Azure announcement this week:\n\n"
+        f"✅ {best_candidate['title']}\n"
+        f"{best_candidate['summary']}\n\n"
+        "Why it matters:\n"
+        "- Supports modernization initiatives\n"
+        "- Improves operational consistency\n"
+        "- Strengthens hybrid-cloud capabilities\n\n"
+        "Read more:\n"
+        f"{best_candidate['link']}\n\n"
+        "#Azure #MicrosoftAzure #AzureArchitecture #HybridCloud #CloudSecurity #AzureMVP"
+    )
+
+
 def write_outputs(selected: list[dict]) -> None:
-    post = build_post(selected)
-    OUTPUT_TEXT.write_text(post, encoding="utf-8", newline="\n")
+    full_post = build_post(selected)
+    OUTPUT_TEXT.write_text(full_post, encoding="utf-8", newline="\n")
 
     json_items = []
     linkedin_candidates = []
@@ -300,35 +340,23 @@ def write_outputs(selected: list[dict]) -> None:
             }
         )
 
-    # Write candidate list file
-    OUTPUT_CANDIDATES.write_text(json.dumps(linkedin_candidates, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    OUTPUT_CANDIDATES.write_text(
+        json.dumps(linkedin_candidates, indent=2, ensure_ascii=False) + "\n",
+        encoding="utf-8",
+    )
 
     if not linkedin_candidates:
         raise RuntimeError("No linkedin candidates were generated")
 
     best_candidate = max(linkedin_candidates, key=lambda x: x["priority"])
+    post_content = build_linkedin_post(best_candidate)
 
-    post_content = f"""
-    🚀 Azure Executive Update
-
-    One important Azure announcement this week:
-    
-✅    {best_candidate["title"]}
-        {best_candidate["summary"]}
-Why it matters:
-• Supports modernization initiatives
-• Improves operational consistency
-• Strengthens hybrid-cloud capabilities
-Read more:
-{best_candidate["link"]}
-#Azure #MicrosoftAzure #AzureArchitecture #HybridCloud #CloudSecurity #AzureMVP""".strip()
-
-    # Overwrite the text output with the compact LinkedIn-ready post (if intended)
     OUTPUT_TEXT.write_text(post_content + "\n", encoding="utf-8")
 
-    # Write JSON outputs
-    OUTPUT_JSON.write_text(json.dumps(json_items, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
-    Path("linkedin_candidates.json").write_text(json.dumps(linkedin_candidates, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    OUTPUT_JSON.write_text(
+        json.dumps(json_items, indent=2, ensure_ascii=False) + "\n",
+        encoding="utf-8",
+    )
 
     if OUTPUT_TEXT.stat().st_size == 0:
         raise RuntimeError("linkedin_post.txt was created but is empty")
@@ -336,11 +364,10 @@ Read more:
     print("Created: " + str(OUTPUT_TEXT))
     print("Created: " + str(OUTPUT_JSON))
     print("Created: " + str(OUTPUT_CANDIDATES))
-    print("Created: linkedin_candidates.json")
     print("linkedin_post.txt bytes: " + str(OUTPUT_TEXT.stat().st_size))
     print("Best LinkedIn candidate: " + best_candidate["title"])
     print("LinkedIn score: " + str(best_candidate["priority"]))
-    print(post)
+    print(post_content)
 
 
 def main() -> int:
@@ -350,61 +377,35 @@ def main() -> int:
         for feed_url in RSS_FEEDS:
             try:
                 print(f"Fetching: {feed_url}")
-
                 xml_bytes = fetch_feed(feed_url)
-
                 feed_items = parse_items(xml_bytes)
 
-                print(
-                    "Items found: "
-                    + str(len(feed_items))
-                )
-
+                print("Items found: " + str(len(feed_items)))
                 all_items.extend(feed_items)
 
             except Exception as feed_exc:
                 print(
-                    "WARNING: "
-                    + feed_url
-                    + " -> "
-                    + str(feed_exc),
+                    "WARNING: " + feed_url + " -> " + str(feed_exc),
                     file=sys.stderr,
                 )
 
         if not all_items:
-            raise RuntimeError(
-                "No readable items found in any RSS feed"
-            )
+            raise RuntimeError("No readable items found in any RSS feed")
 
-        selected = select_updates(
-            all_items,
-            MAX_UPDATES,
-        )
+        selected = select_updates(all_items, MAX_UPDATES)
 
         if not selected:
-            raise RuntimeError(
-                "No Azure updates were selected"
-            )
+            raise RuntimeError("No Azure updates were selected")
 
         write_outputs(selected)
 
-        print(
-            "Total updates received: "
-            + str(len(all_items))
-        )
-
-        print(
-            "Updates selected: "
-            + str(len(selected))
-        )
+        print("Total updates received: " + str(len(all_items)))
+        print("Updates selected: " + str(len(selected)))
 
         return 0
 
     except Exception as exc:
-        print(
-            "ERROR: " + str(exc),
-            file=sys.stderr,
-        )
+        print("ERROR: " + str(exc), file=sys.stderr)
         return 1
 
 
