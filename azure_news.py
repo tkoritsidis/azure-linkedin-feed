@@ -14,8 +14,8 @@ from email.utils import parsedate_to_datetime
 from pathlib import Path
 
 RSS_FEEDS = [
-    "[microsoft.com](https://www.microsoft.com/releasecommunications/api/v2/azure/rss)",
-    "[techcommunity.microsoft.com](https://techcommunity.microsoft.com/gxcuf89792/rss/board?board.id=Azure)",
+    "https://www.microsoft.com/releasecommunications/api/v2/azure/rss",
+    "https://techcommunity.microsoft.com/gxcuf89792/rss/board?board.id=Azure",
 ]
 
 MAX_UPDATES = 5
@@ -305,9 +305,6 @@ def build_linkedin_post(best_candidate: dict) -> str:
 
 
 def write_outputs(selected: list[dict]) -> None:
-    full_post = build_post(selected)
-    OUTPUT_TEXT.write_text(full_post, encoding="utf-8", newline="\n")
-
     json_items = []
     linkedin_candidates = []
 
@@ -325,7 +322,6 @@ def write_outputs(selected: list[dict]) -> None:
             }
         )
 
-    for item in selected:
         linkedin_candidates.append(
             {
                 "selected": False,
@@ -340,19 +336,18 @@ def write_outputs(selected: list[dict]) -> None:
             }
         )
 
-    OUTPUT_CANDIDATES.write_text(
-        json.dumps(linkedin_candidates, indent=2, ensure_ascii=False) + "\n",
-        encoding="utf-8",
-    )
-
     if not linkedin_candidates:
         raise RuntimeError("No linkedin candidates were generated")
 
     best_candidate = max(linkedin_candidates, key=lambda x: x["priority"])
     post_content = build_linkedin_post(best_candidate)
 
+    # Save outputs
     OUTPUT_TEXT.write_text(post_content + "\n", encoding="utf-8")
-
+    OUTPUT_CANDIDATES.write_text(
+        json.dumps(linkedin_candidates, indent=2, ensure_ascii=False) + "\n",
+        encoding="utf-8",
+    )
     OUTPUT_JSON.write_text(
         json.dumps(json_items, indent=2, ensure_ascii=False) + "\n",
         encoding="utf-8",
