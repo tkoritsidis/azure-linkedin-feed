@@ -106,7 +106,6 @@ def fetch_feed(url: str) -> bytes:
             "Accept": "application/rss+xml, application/xml, text/xml",
         },
     )
- 
 with urllib.request.urlopen(request, timeout=30) as response:
 return response.read()
 
