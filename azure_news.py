@@ -342,12 +342,13 @@ def write_outputs(selected: list[dict]) -> None:
     best_candidate = max(linkedin_candidates, key=lambda x: x["priority"])
     post_content = build_linkedin_post(best_candidate)
 
-    # Save outputs
     OUTPUT_TEXT.write_text(post_content + "\n", encoding="utf-8")
+
     OUTPUT_CANDIDATES.write_text(
         json.dumps(linkedin_candidates, indent=2, ensure_ascii=False) + "\n",
         encoding="utf-8",
     )
+
     OUTPUT_JSON.write_text(
         json.dumps(json_items, indent=2, ensure_ascii=False) + "\n",
         encoding="utf-8",
